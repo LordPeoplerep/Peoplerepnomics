@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Peoplerepnomics Minimum Wage Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        canvas {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Peoplerepnomics Hourly Minimum Wage Calculator</h1>
+    <label>Average Annual Salary (CAD $): <input type="number" id="avgSalary" step="0.01" value="67785.43"></label>
+    <label>Average House Price (CAD $): <input type="number" id="housePrice" step="0.01" value="578987.74"></label>
+    <label>Target Living Income (CAD $/year): <input type="number" id="livingIncome" step="0.01" value="40000"></label>
+    <button onclick="calculate()">Calculate Minimum Hourly Wage</button>
+    <h2>Result: <span id="result">CAD $0.00</span></h2>
+
+    <canvas id="ratioChart" width="600" height="300"></canvas>
+
+    <script>
+        let ratioChartInstance = null;
+
+        function formatCurrency(num) {
+            return "CAD $" + num.toLocaleString("en-CA", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function calculate() {
+            let avgSalary = parseFloat(document.getElementById("avgSalary").value);
+            let housePrice = parseFloat(document.getElementById("housePrice").value);
+            let livingIncome = parseFloat(document.getElementById("livingIncome").value);
+
+            let numerator = avgSalary * (housePrice / 5);
+            let denominator = livingIncome * 2080;
+            let minWage = numerator / denominator;
+            document.getElementById("result").textContent = formatCurrency(minWage);
+
+            const ctx = document.getElementById('ratioChart').getContext('2d');
+            if (ratioChartInstance) {
+                ratioChartInstance.destroy();
+            }
+
+            ratioChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Average Salary', 'Average House Price'],
+                    datasets: [{
+                        label: 'Amount (CAD $)',
+                        data: [avgSalary, housePrice],
+                        backgroundColor: ['#2ECC40', '#FF4136']
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparison: Salary vs House Price (CAD)'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
